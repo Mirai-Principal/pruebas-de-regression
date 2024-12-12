@@ -1,0 +1,29 @@
+MODULE main
+VAR
+   usuario_registrado : boolean;   -- Indica si el usuario está registrado.
+   intento_registro : boolean;    -- Simula intentos de registro de usuarios.
+   intento_autenticacion : boolean; -- Simula intentos de autenticación.
+   autenticado : boolean;         -- Indica si el usuario está autenticado.
+
+ASSIGN
+   -- Estado inicial
+   init(usuario_registrado) := FALSE;
+   init(intento_registro) := FALSE;
+   init(intento_autenticacion) := FALSE;
+   init(autenticado) := FALSE;
+
+   -- Transiciones para registro de usuarios
+   next(usuario_registrado) := case
+      !usuario_registrado & intento_registro : TRUE; -- Si hay un intento de registro, el usuario se registra.
+      TRUE : usuario_registrado;                     -- Permanece registrado.
+   esac;
+
+   -- Transiciones para autenticación
+   next(autenticado) := case
+      intento_autenticacion & usuario_registrado : TRUE; -- Solo se autentica si está registrado.
+      !intento_autenticacion : FALSE;                   -- Desautenticado si no hay intento.
+      TRUE : autenticado;                               -- Mantiene el estado de autenticación.
+   esac;
+
+-- Propiedad 1: Solo usuarios registrados pueden autenticarse
+LTLSPEC G (autenticado -> usuario_registrado)
